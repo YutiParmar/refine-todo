@@ -1,14 +1,17 @@
-import { Refine} from "@refinedev/core";
+import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import Header from "./components/pages/Header"
-// import Login from "./components/pages/Login";
+import Login from "./components/pages/Login"
+import CalendarComponent from "./components/pages/Calender";
+import TaskTemplate from "./components/pages/Task";
+
+
 import nestjsxCrudDataProvider from "@refinedev/nestjsx-crud";
 import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import "./App.css";
 
 function App() {
@@ -16,8 +19,8 @@ function App() {
   const dataProvider = nestjsxCrudDataProvider(API_URL);
 
   return (
+    
     <BrowserRouter>
-      
       <RefineKbarProvider>
         <DevtoolsProvider>
           <Refine
@@ -27,11 +30,14 @@ function App() {
               syncWithLocation: true,
               warnWhenUnsavedChanges: true,
               useNewQueryKeys: true,
-              projectId: "vnPAZh-cV718p-UcLIi1",
+              projectId: "U8VA2H-miRUnV-Ac064y",
             }}
           >
             <Routes>
-              <Route index element={<Header/>} />
+            <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/task" element={<TaskTemplate/>} />
+          <Route path="/calender" element={<CalendarComponent/>} />
             </Routes>
             <RefineKbar />
             <UnsavedChangesNotifier />
