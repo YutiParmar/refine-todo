@@ -1,7 +1,8 @@
-import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
+import { Refine} from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
+import Header from "./components/pages/Header"
+// import Login from "./components/pages/Login";
 import nestjsxCrudDataProvider from "@refinedev/nestjsx-crud";
 import routerBindings, {
   DocumentTitleHandler,
@@ -16,7 +17,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <GitHubBanner />
+      
       <RefineKbarProvider>
         <DevtoolsProvider>
           <Refine
@@ -30,7 +31,7 @@ function App() {
             }}
           >
             <Routes>
-              <Route index element={<WelcomePage />} />
+              <Route index element={<Header/>} />
             </Routes>
             <RefineKbar />
             <UnsavedChangesNotifier />
