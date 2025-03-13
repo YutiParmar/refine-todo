@@ -1,110 +1,96 @@
 import { useState } from "react";
-import { Calendar } from "../ui/calendar";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { format } from "date-fns";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 
-interface Task {
+interface Reminder {
   date: string;
-  title: string;
-  description: string;
-  reminder: string;
+  text: string;
 }
 
-export default function CalendarComponent() {
+export default function FullPageCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [reminderTime, setReminderTime] = useState("");
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [reminderText, setReminderText] = useState("");
 
-  const addTask = () => {
-    if (!taskTitle.trim()) return;
-    if (!selectedDate) return;
-    
-    const newTask: Task = {
-      date: selectedDate.toDateString(),
-      title: taskTitle,
-      description: taskDescription,
-      reminder: reminderTime,
-    };
-    
-    setTasks([...tasks, newTask]);
-    setTaskTitle("");
-    setTaskDescription("");
-    setReminderTime("");
+  const addReminder = () => {
+    if (!selectedDate || !reminderText.trim()) return;
+
+    const newReminder: Reminder = { date: format(selectedDate, "PPP"), text: reminderText };
+    setReminders([...reminders, newReminder]);
+    setReminderText("");
+  };
+
+  const deleteReminder = (indexToDelete: number) => {
+    setReminders(reminders.filter((_, index) => index !== indexToDelete));
   };
 
   return (
-    <div className="w-screen flex flex-col items-center justify-center bg-black p-6">
-      <h2 className="text-white text-3xl font-bold mb-6">Task Calendar</h2>
-      
-      {/* Calendar Section */}
-      <Card className="w-full max-w-4xl">
-        <CardHeader>
-          <CardTitle>Select a Date</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center">
-          <Calendar 
-            mode="single" 
-            selected={selectedDate} 
-            onSelect={setSelectedDate} 
-            className="w-full max-w-lg" 
-          />
-          {selectedDate && <p className="mt-4 text-lg font-medium">Selected Date: {selectedDate.toDateString()}</p>}
-        </CardContent>
-      </Card>
+    
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white pb-6">
+      <h1 className=" bg-black text-3xl">Calendar</h1>
+      <div className="w-full max-w-7xl bg-black p-4 rounded-lg shadow-lg">
+        <DayPicker
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          className="w-full"
+          classNames={{
+            months: "flex flex-col items-center",
+            month: "w-full",
+            caption: "text-2xl font-bold text-center mb-4",
+            table: "w-full border-collapse",
+            head_row: "grid grid-cols-7 text-lg font-semibold text-gray-300",
+            head_cell: "p-3 text-center",
+            row: "grid grid-cols-7",
+            cell: "h-24 w-24 flex flex-col items-center justify-center text-xl font-medium cursor-pointer rounded-lg hover:bg-gray-700 transition relative",
+            day_selected: "bg-blue-600 text-white",
+            day_today: "bg-green-600 text-white",
+            day_outside: "text-gray-500",
+          }}
+          formatters={{
+            formatWeekdayName: (day) => format(day, "EEEE"), // Full weekday names
+          }}
+        />
+      </div>
 
-      {/* Add Task Dialog */}
+      <p className="mt-1 text-lg">Selected Date: {selectedDate ? format(selectedDate, "PPP") : "None"}</p>
+
+      {/* Reminder Modal */}
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="mt-6">Add Task</Button>
+          <Button className="mt-4">Add Reminder</Button>
         </DialogTrigger>
         <DialogContent>
-          <DialogTitle>Add Task for {selectedDate?.toDateString()}</DialogTitle>
-          <Input 
-            placeholder="Task Title" 
-            value={taskTitle} 
-            onChange={(e) => setTaskTitle(e.target.value)} 
-          />
+          <DialogTitle>Add Reminder for {selectedDate ? format(selectedDate, "PPP") : "None"}</DialogTitle>
           <Textarea 
-            placeholder="Task Description" 
-            value={taskDescription} 
-            onChange={(e) => setTaskDescription(e.target.value)} 
+            placeholder="Enter reminder..." 
+            value={reminderText} 
+            onChange={(e) => setReminderText(e.target.value)} 
           />
-          <Input 
-            type="time" 
-            placeholder="Set Reminder" 
-            value={reminderTime} 
-            onChange={(e) => setReminderTime(e.target.value)} 
-          />
-          <Button onClick={addTask}>Save Task</Button>
+          <Button onClick={addReminder}>Save Reminder</Button>
         </DialogContent>
       </Dialog>
 
-      {/* Task List */}
-      <Card className="w-full max-w-4xl mt-6">
-        <CardHeader>
-          <CardTitle>Tasks for {selectedDate?.toDateString()}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {tasks.filter(task => task.date === selectedDate?.toDateString()).length === 0 ? (
-            <p className="text-gray-500">No tasks for this date.</p>
-          ) : (
-            tasks
-              .filter(task => task.date === selectedDate?.toDateString())
-              .map((task, index) => (
-                <div key={index} className="p-4 border-b">
-                  <h3 className="text-lg font-semibold">{task.title}</h3>
-                  <p className="text-gray-600">{task.description}</p>
-                  <p className="text-sm text-red-500">Reminder at: {task.reminder || "Not set"}</p>
-                </div>
-              ))
-          )}
-        </CardContent>
-      </Card>
+      {/* Display Reminders Under Each Date */}
+      <div className="mt-6 w-full max-w-6xl">
+        {reminders.length === 0 ? (
+          <p className="text-gray-400 text-center">No reminders set.</p>
+        ) : (
+          reminders.map((reminder, index) => (
+            <div key={index} className="p-4 border-b bg-gray-800 rounded-lg mt-2 flex justify-between items-center">
+              <div>
+                <p className="text-xl font-semibold">{reminder.date}</p>
+                <p className="text-gray-300">{reminder.text}</p>
+              </div>
+              <Button variant="destructive" onClick={() => deleteReminder(index)}>Delete</Button>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
