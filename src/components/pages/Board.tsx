@@ -13,15 +13,29 @@ const initialTasks = {
 
 export default function TaskBoard() {
     const [tasks, setTasks] = useState(initialTasks);
-    const [newTask, setNewTask] = useState({ task: "", description: "", assignee: "", status: "backlog" });
+
+    // Store separate newTask input for each column
+    const [newTasks, setNewTasks] = useState({
+        backlog: { task: "", description: "", assignee: "" },
+        open: { task: "", description: "", assignee: "" },
+        "in-progress": { task: "", description: "", assignee: "" },
+        completed: { task: "", description: "", assignee: "" }
+    });
 
     const addTask = (status) => {
-        if (newTask.task && newTask.description && newTask.assignee) {
+        const taskDetails = newTasks[status];
+
+        if (taskDetails.task && taskDetails.description && taskDetails.assignee) {
             setTasks({
                 ...tasks,
-                [status]: [...tasks[status], { ...newTask, id: Date.now() }]
+                [status]: [...tasks[status], { ...taskDetails, id: Date.now(), status }]
             });
-            setNewTask({ task: "", description: "", assignee: "", status: "backlog" });
+
+            // Reset only the input fields for the relevant column
+            setNewTasks({
+                ...newTasks,
+                [status]: { task: "", description: "", assignee: "" }
+            });
         }
     };
 
@@ -42,46 +56,59 @@ export default function TaskBoard() {
     };
 
     return (
-      <div>
-       <div className="p-4 bg-black text-2xl text-white"> Task Board</div>
-        <div className="grid grid-cols-4 gap-4 p-4">
+        <div>
+        <div className="p-4 bg-black text-2xl text-white">Task Board</div>
+         <div className="grid grid-cols-4 gap-4 p-4">
             {Object.keys(tasks).map((status) => (
-                <div key={status} className="p-4 bg-gray-100 rounded-md shadow-md">
-                    <h2 className="font-semibold text-lg mb-2 capitalize">{status.replace("-", " ")}</h2>
-                    <div className="space-y-2">
-                        {tasks[status].map((task) => (
-                            <Card key={task.id} className="p-2">
-                                <CardContent>
-                                    <p className="font-semibold">{task.task}</p>
-                                    <p className="text-sm">{task.description}</p>
-                                    <p className="text-xs text-gray-600">Assigned to: {task.assignee}</p>
-                                    <div className="flex justify-between mt-2">
-                                        <Select onValueChange={(value) => moveTask(task, value)}>
-                                            <SelectTrigger className="w-[120px]">
-                                                <SelectValue placeholder={task.status} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {Object.keys(tasks).map((s) => (
-                                                    <SelectItem key={s} value={s}>{s.replace("-", " ")}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <Button variant="destructive" onClick={() => deleteTask(status, task.id)}>Delete</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+            <div key={status} className="p-4 bg-gray-100 rounded-md shadow-md">
+            <h2 className="font-semibold text-lg mb-2 capitalize">{status.replace("-", " ")}</h2>
+            <div className="space-y-2">
+             {tasks[status].map((task) => (
+            <Card key={task.id} className="p-2">
+             <CardContent>
+            <p className="font-semibold">{task.task}</p>
+             <p className="text-sm">{task.description}</p>
+            <p className="text-xs text-gray-600">Assigned to: {task.assignee}</p>
+            <div className="flex justify-between mt-2">
+            <Select onValueChange={(value) => moveTask(task, value)}>
+            <SelectTrigger className="w-[120px]">
+                                                    <SelectValue placeholder={task.status} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {Object.keys(tasks).map((s) => (
+                                                        <SelectItem key={s} value={s}>{s.replace("-", " ")}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Button variant="destructive" onClick={() => deleteTask(status, task.id)}>Delete</Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {/* Task Input Fields - Now Separate Per Column */}
+                        <div className="mt-4 space-y-2">
+                            <Input
+                                placeholder="Task"
+                                value={newTasks[status].task}
+                                onChange={(e) => setNewTasks({ ...newTasks, [status]: { ...newTasks[status], task: e.target.value } })}
+                            />
+                            <Input
+                                placeholder="Description"
+                                value={newTasks[status].description}
+                                onChange={(e) => setNewTasks({ ...newTasks, [status]: { ...newTasks[status], description: e.target.value } })}
+                            />
+                            <Input
+                                placeholder="Assignee"
+                                value={newTasks[status].assignee}
+                                onChange={(e) => setNewTasks({ ...newTasks, [status]: { ...newTasks[status], assignee: e.target.value } })}
+                            />
+                            <Button onClick={() => addTask(status)}>Add Task</Button>
+                        </div>
                     </div>
-                    <div className="mt-4 space-y-2">
-                        <Input placeholder="Task" value={newTask.task} onChange={(e) => setNewTask({ ...newTask, task: e.target.value })} />
-                        <Input placeholder="Description" value={newTask.description} onChange={(e) => setNewTask({ ...newTask, description: e.target.value })} />
-                        <Input placeholder="Assignee" value={newTask.assignee} onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })} />
-                        <Button onClick={() => addTask(status)}>Add Task</Button>
-                    </div>
-                </div>
-                
-            ))}
-        </div>
+                ))}
+            </div>
         </div>
     );
 }

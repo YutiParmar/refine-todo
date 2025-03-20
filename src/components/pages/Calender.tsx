@@ -18,9 +18,7 @@ export default function FullPageCalendar() {
 
   const addReminder = () => {
     if (!selectedDate || !reminderText.trim()) return;
-
-    const newReminder: Reminder = { date: format(selectedDate, "PPP"), text: reminderText };
-    setReminders([...reminders, newReminder]);
+    setReminders([...reminders, { date: format(selectedDate, "PPP"), text: reminderText }]);
     setReminderText("");
   };
 
@@ -29,10 +27,10 @@ export default function FullPageCalendar() {
   };
 
   return (
-    
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white pb-6">
-      <h1 className=" bg-black text-3xl">Calendar</h1>
-      <div className="w-full max-w-7xl bg-black p-4 rounded-lg shadow-lg">
+    <div className="h-screen flex flex-col items-center justify-center bg-black text-white p-2">
+      <h1 className="text-md font-bold mb-2 ml-7 text-gradient-to-r from-white to-slate-600 ">Calendar</h1>
+
+      <div className="w-full max-w-md p-2 rounded-lg shadow-lg">
         <DayPicker
           mode="single"
           selected={selectedDate}
@@ -41,54 +39,54 @@ export default function FullPageCalendar() {
           classNames={{
             months: "flex flex-col items-center",
             month: "w-full",
-            caption: "text-2xl font-bold text-center mb-4",
+            caption: "text-sm font-semibold text-center mb-1",
             table: "w-full border-collapse",
-            head_row: "grid grid-cols-7 text-lg font-semibold text-gray-300",
-            head_cell: "p-3 text-center",
+            head_row: "grid grid-cols-7 text-xs font-semibold text-gray-300",
+            head_cell: "p-1 text-center",
             row: "grid grid-cols-7",
-            cell: "h-24 w-24 flex flex-col items-center justify-center text-xl font-medium cursor-pointer rounded-lg hover:bg-gray-700 transition relative",
+            cell: "h-10 w-10 flex flex-col items-center justify-center text-xs font-medium cursor-pointer rounded-lg hover:bg-gray-700 transition",
             day_selected: "bg-blue-600 text-white",
             day_today: "bg-green-600 text-white",
             day_outside: "text-gray-500",
           }}
-          formatters={{
-            formatWeekdayName: (day) => format(day, "EEEE"), // Full weekday names
-          }}
         />
       </div>
 
-      <p className="mt-1 text-lg">Selected Date: {selectedDate ? format(selectedDate, "PPP") : "None"}</p>
+      <p className="mt-1 text-xs">Selected Date: {selectedDate ? format(selectedDate, "PPP") : "None"}</p>
 
       {/* Reminder Modal */}
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="mt-4">Add Reminder</Button>
+          <Button className="mt-1 text-xs px-1 py-0.5">Add Reminder</Button>
         </DialogTrigger>
-        <DialogContent>
-          <DialogTitle>Add Reminder for {selectedDate ? format(selectedDate, "PPP") : "None"}</DialogTitle>
+        <DialogContent className="max-w-xs">
+          <DialogTitle className="text-xs">Add Reminder for {selectedDate ? format(selectedDate, "PPP") : "None"}</DialogTitle>
           <Textarea 
             placeholder="Enter reminder..." 
             value={reminderText} 
             onChange={(e) => setReminderText(e.target.value)} 
+            className="text-xs p-1 h-12"
           />
-          <Button onClick={addReminder}>Save Reminder</Button>
+          <Button onClick={addReminder} className="text-xs px-1 py-0.5">Save</Button>
         </DialogContent>
       </Dialog>
 
-      {/* Display Reminders Under Each Date */}
-      <div className="mt-6 w-full max-w-6xl">
+      {/* Display Reminders */}
+      <div className="mt-1 w-screen h-32 max-w-md mb-7 ">
         {reminders.length === 0 ? (
-          <p className="text-gray-400 text-center">No reminders set.</p>
+          <p className="text-gray-400 text-center text-xs">No reminders set.</p>
         ) : (
-          reminders.map((reminder, index) => (
-            <div key={index} className="p-4 border-b bg-gray-800 rounded-lg mt-2 flex justify-between items-center">
-              <div>
-                <p className="text-xl font-semibold">{reminder.date}</p>
-                <p className="text-gray-300">{reminder.text}</p>
+          <div className="max-h-26 overflow-auto">
+            {reminders.map((reminder, index) => (
+              <div key={index} className="mr-2 ml-4 p-1 mt-1 border-b  bg-slate-300 text-gradient-to-r from-white to-slate-600 rounded-lg flex justify-between items-center text-xs border-solid ">
+                <div>
+                  <p className="font-medium">{reminder.date}</p>
+                  <p className="text-gray-500 font-medium ">{reminder.text}</p>
+                </div>
+                <Button variant="destructive" onClick={() => deleteReminder(index)} className="text-xs px-2 py-0 bg-white text-black">X</Button>
               </div>
-              <Button variant="destructive" onClick={() => deleteReminder(index)}>Delete</Button>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>
