@@ -1,11 +1,43 @@
 {
   "tasks": [
     {
-      "task": "new task",
-      "description": "refine todo",
-      "assignee": "pritam",
-      "id": "1743067801425",
-      "status": "backlog"
+      "task": " ",
+      "description": "",
+      "assignee": "",
+      "id": "",
+      "status": ""
+    }
+  ],
+  "users": [
+    {
+      "id": "8a60",
+      "username": "yuti",
+      "role": "Admin"
+    },
+    {
+      "id": "b92d",
+      "username": "pritam",
+      "role": "Admin"
+    },
+    {
+      "id": "cf64",
+      "username": "apurva",
+      "role": "User"
+    },
+    {
+      "id": "ad0b",
+      "username": "shivam",
+      "role": "User"
+    },
+    {
+      "id": "7fc6",
+      "username": "yuti",
+      "role": "User"
+    },
+    {
+      "id": "b097",
+      "username": "pritam",
+      "role": "Guest"
     }
   ]
 }

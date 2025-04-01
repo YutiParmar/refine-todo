@@ -5,17 +5,16 @@ import Dashboard from "./components/pages/Dashboard";
 import Todo from "./components/pages/todo/Todo";
 import Calendar from "./components/pages/Calender";
 import Board from "./components/pages/Board";
-import LogoutSuccessful from "./components/pages/Logout";
 import nestjsxCrudDataProvider from "@refinedev/nestjsx-crud";
 import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"; // Correct Import
 import "./App.css";
 import Login from "./components/pages/Login";
 
-// Function to check if user is authenticated
+// ✅ Function to check if user is authenticated
 const isAuthenticated = () => {
   const user = localStorage.getItem("user");
   if (!user) return false; // No user found, block access
@@ -29,7 +28,7 @@ const isAuthenticated = () => {
   }
 };
 
-// Protected Route Wrapper
+// ✅ Protected Route Wrapper
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return isAuthenticated() ? children : <Navigate to="/" replace />;
 };
@@ -54,9 +53,8 @@ function App() {
           >
             <Routes>
               <Route path="/" element={<Login />} />
-              {/* Protected Dashboard Routes */}
               <Route
-                path="/dashboard/*"
+                path="/dashboard"
                 element={
                   <ProtectedRoute>
                     <Dashboard />
@@ -67,14 +65,9 @@ function App() {
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="board" element={<Board />} />
               </Route>
-
-              {/* Standalone logout success page */}
-              <Route path="/logout-success" element={<LogoutSuccessful />} />
-
-              {/* Redirect unknown routes */}
-              <Route path="*" element={<Navigate to="/"/>} />
+              {/* Redirect all unknown routes */}
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
-
             <RefineKbar />
             <UnsavedChangesNotifier />
             <DocumentTitleHandler />
