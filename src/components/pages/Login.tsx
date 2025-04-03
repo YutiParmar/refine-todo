@@ -11,14 +11,14 @@ export default function Login() {
   const handleLogin = async () => {
     if (username.trim() && role) {
       try {
-        // 1️⃣ Fetch users from db.json
+        // 1 Fetch users from db.json
         const response = await fetch("http://localhost:3001/users");
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }
         const users = await response.json();
 
-        // 2️⃣ Check if the user with both username and role exists
+        // 2 Check if the user with both username and role exists
         const existingUser = users.find(
           (user: any) => user.username === username && user.role === role
         );
@@ -27,7 +27,7 @@ export default function Login() {
           console.log("User already exists, logging in...");
           localStorage.setItem("user", JSON.stringify(existingUser));
         } else {
-          // 3️⃣ If new user, save to db.json
+          // 3 If new user, save to db.json
           const newUser = { username, role };
 
           const saveResponse = await fetch("http://localhost:3001/users", {
@@ -45,7 +45,7 @@ export default function Login() {
           localStorage.setItem("user", JSON.stringify(newUser));
         }
 
-        // 4️⃣ Store in localStorage and Redirect
+        // 4 Store in localStorage and Redirect
         localStorage.setItem("userRole", role);
         localStorage.setItem("username", username);
         navigate("/dashboard/todo");
@@ -83,7 +83,7 @@ export default function Login() {
           >
             <option value="">Select Role</option>
             {roles.map((r) => (
-              <option key={r} value={r} className="text-gray-900">
+              <option key={r} value={r} className="text-gray-300">
                 {r}
               </option>
             ))}

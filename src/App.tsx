@@ -5,6 +5,7 @@ import Dashboard from "./components/pages/Dashboard";
 import Todo from "./components/pages/todo/Todo";
 import Calendar from "./components/pages/Calender";
 import Board from "./components/pages/Board";
+import ProtectedRouteComponent from "./components/pages/ProtectedRoute"; 
 import nestjsxCrudDataProvider from "@refinedev/nestjsx-crud";
 import routerBindings, {
   DocumentTitleHandler,
@@ -52,21 +53,24 @@ function App() {
             }}
           >
             <Routes>
-              <Route path="/" element={<Login />} />
+               {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              {/* Protected Routes */}
               <Route
                 path="/dashboard"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRouteComponent>
                     <Dashboard />
-                  </ProtectedRoute>
+                  </ProtectedRouteComponent>
                 }
               >
                 <Route path="todo" element={<Todo />} />
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="board" element={<Board />} />
-              </Route>
+                </Route>
+                
               {/* Redirect all unknown routes */}
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
             <RefineKbar />
             <UnsavedChangesNotifier />
