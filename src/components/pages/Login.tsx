@@ -11,41 +11,50 @@ export default function Login() {
   const handleLogin = async () => {
     if (username.trim() && role) {
       try {
-        // 1 Fetch users from db.json
-        const response = await fetch("http://localhost:3001/users");
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
-        const users = await response.json();
-
-        // 2 Check if the user with both username and role exists
-        const existingUser = users.find(
-          (user: any) => user.username === username && user.role === role
-        );
-
-        if (existingUser) {
-          console.log("User already exists, logging in...");
-          localStorage.setItem("user", JSON.stringify(existingUser));
-        } else {
-          // 3 If new user, save to db.json
-          const newUser = { username, role };
-
-          const saveResponse = await fetch("http://localhost:3001/users", {
+        // 1. Fetch users
+        const userRes = await fetch("http://localhost:3001/users");
+        const users = await userRes.json();
+  
+        // 2. Try to find existing user
+        let user = users.find((u: any) => u.username === username);
+  
+        if (!user) {
+          // 3. Create new user with unique id
+          const newUser = {
+            id: Math.random().toString(36).substring(2, 8),
+            username,
+            role,
+          };
+  
+          const saveUser = await fetch("http://localhost:3001/users", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newUser),
           });
-
-          if (!saveResponse.ok) {
-            throw new Error("Failed to save user");
-          }
-
-          localStorage.setItem("user", JSON.stringify(newUser));
+  
+          if (!saveUser.ok) throw new Error("Failed to save user");
+  
+          user = newUser;
         }
-
-        // 4 Store in localStorage and Redirect
+  
+        // 4. Check roles endpoint
+        const rolesRes = await fetch("http://localhost:3001/roles");
+        const roleList = await rolesRes.json();
+  
+        const existingRole = roleList.find((r: any) => r.id === user.id);
+  
+        if (!existingRole) {
+          const saveRole = await fetch("http://localhost:3001/roles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: user.id, role }),
+          });
+  
+          if (!saveRole.ok) throw new Error("Failed to save role");
+        }
+  
+        // 5. Store data in localStorage and redirect
+        localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userRole", role);
         localStorage.setItem("username", username);
         navigate("/dashboard/todo");
@@ -57,6 +66,7 @@ export default function Login() {
       alert("Please enter a valid username and select a valid role.");
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-300 to-slate-800">
